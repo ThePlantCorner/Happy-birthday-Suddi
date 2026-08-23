@@ -37,7 +37,12 @@
   /* ---------- Tap-to-begin overlay ---------- */
   #gate{
     position:fixed; inset:0; z-index:100;
-    background:radial-gradient(circle at 50% 30%, var(--plum-soft), var(--ink) 70%);
+    background:
+      linear-gradient(180deg, rgba(36,20,54,0.55), rgba(36,20,54,0.75) 60%, var(--ink) 100%),
+      url('suddi-and-me.jpeg');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:24px; gap:22px;
     transition:opacity .6s ease, visibility .6s ease;
