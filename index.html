@@ -34,6 +34,38 @@
     pointer-events:none; z-index:40;
   }
 
+  /* ---------- Floating hearts (whole-site layer) ---------- */
+  #hearts-field{
+    position:fixed; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:2; overflow:hidden;
+  }
+  .heart{
+    position:absolute; bottom:-60px; opacity:0; will-change:transform, opacity;
+    animation:heartFloat linear infinite;
+  }
+  @keyframes heartFloat{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg) scale(0.9); opacity:0; }
+    10%{ opacity:.85; }
+    50%{ transform:translateY(-55vh) translateX(24px) rotate(14deg) scale(1.05); }
+    90%{ opacity:.7; }
+    100%{ transform:translateY(-112vh) translateX(-18px) rotate(-10deg) scale(0.95); opacity:0; }
+  }
+
+  /* ---------- Text entrance animation ---------- */
+  @keyframes fadeUpIn{
+    0%{ opacity:0; transform:translateY(22px); }
+    100%{ opacity:1; transform:translateY(0); }
+  }
+  .reveal{ opacity:0; animation:fadeUpIn .8s ease forwards; }
+  .reveal.r1{ animation-delay:.05s; }
+  .reveal.r2{ animation-delay:.2s; }
+  .reveal.r3{ animation-delay:.35s; }
+  .reveal.r4{ animation-delay:.5s; }
+  .reveal.r5{ animation-delay:.65s; }
+  /* scroll-triggered reveals (sections below the fold) */
+  .reveal-on-scroll{ opacity:0; transform:translateY(24px); transition:opacity .8s ease, transform .8s ease; }
+  .reveal-on-scroll.in-view{ opacity:1; transform:translateY(0); }
+
   /* ---------- Tap-to-begin overlay ---------- */
   #gate{
     position:fixed; inset:0; z-index:100;
@@ -188,22 +220,23 @@
 <body>
 
 <canvas id="confetti-canvas"></canvas>
+<div id="hearts-field"></div>
 
 <!-- Tap-to-begin gate (needed so audio can play on mobile) -->
 <div id="gate">
-  <div class="balloon-emoji">🎈</div>
-  <h1>Someone's got a birthday!</h1>
-  <p>Type their name, then tap start to unwrap the celebration — confetti, cake, and a little song.</p>
-  <input id="nameInput" type="text" placeholder="Their name (optional)" maxlength="24" value="Suddi">
-  <button id="startBtn">🎉 Start the celebration</button>
+  <div class="balloon-emoji reveal r1">🎈</div>
+  <h1 class="reveal r2">Someone's got a birthday!</h1>
+  <p class="reveal r3">Type their name, then tap start to unwrap the celebration — confetti, cake, and a little song.</p>
+  <input id="nameInput" class="reveal r4" type="text" placeholder="Their name (optional)" maxlength="24" value="Suddi">
+  <button id="startBtn" class="reveal r5">🎉 Start the celebration</button>
 </div>
 
 <main>
   <section id="hero">
     <div class="balloons" id="balloonField"></div>
-    <div class="eyebrow">a small corner of the internet, just for you</div>
-    <h1>Happy <span>Birthday</span><br><span id="heroName">Friend</span>! 🎂</h1>
-    <p class="sub">Another trip around the sun, another year to make wonderful. Here's to cake before dinner, wishes that come true, and a day that feels entirely yours.</p>
+    <div class="eyebrow reveal-on-scroll in-view">a small corner of the internet, just for you</div>
+    <h1 class="reveal-on-scroll in-view">Happy <span>Birthday</span><br><span id="heroName">Friend</span>! 🎂</h1>
+    <p class="sub reveal-on-scroll in-view">Another trip around the sun, another year to make wonderful. Here's to cake before dinner, wishes that come true, and a day that feels entirely yours.</p>
     <div class="cta-row">
       <button class="btn btn-primary" onclick="document.getElementById('cake-section').scrollIntoView({behavior:'smooth'})">Blow out the candles</button>
       <button class="btn btn-ghost" onclick="burstConfetti(140)">More confetti!</button>
@@ -212,8 +245,8 @@
   </section>
 
   <section id="cake-section">
-    <h2 id="cakeHeading">Make a wish, <span id="cakeName">friend</span></h2>
-    <p class="hint" id="cakeHint">tap each candle to blow it out</p>
+    <h2 class="reveal-on-scroll" id="cakeHeading">Make a wish, <span id="cakeName">friend</span></h2>
+    <p class="hint reveal-on-scroll" id="cakeHint">tap each candle to blow it out</p>
     <div class="cake-wrap">
       <div class="candles" id="candles"></div>
       <div class="cake-tiers">
@@ -226,7 +259,7 @@
   </section>
 
   <section id="wish-section">
-    <div class="card">
+    <div class="card reveal-on-scroll">
       <span class="quote-mark">“</span>
       <p id="wishText">May this year hand you exactly what you need, disguised as the things you didn't know you wanted. May <b id="wishName">you</b> laugh loudly, rest often, and feel loved every single day of it. Happy birthday!</p>
       <div class="signature">— with love, from all of us</div>
@@ -234,8 +267,8 @@
   </section>
 
   <section id="player-section">
-    <h2>a little song for the moment 🎵</h2>
-    <div class="player">
+    <h2 class="reveal-on-scroll">a little song for the moment 🎵</h2>
+    <div class="player reveal-on-scroll">
       <button id="playToggle" aria-label="Play birthday song">▶</button>
       <div class="player-meta">
         <div class="title">Happy Birthday</div>
@@ -255,6 +288,36 @@
 <footer>made with care · tap anywhere for a confetti surprise</footer>
 
 <script>
+/* ---------------- Floating hearts across the whole site ---------------- */
+const heartsField = document.getElementById('hearts-field');
+const heartColors = ['#FF3E7F', '#ff6f9c', '#FFC845', '#ffffff'];
+function spawnHeart(){
+  const h = document.createElement('div');
+  h.className = 'heart';
+  h.textContent = Math.random() > 0.5 ? '♥' : '❤';
+  const size = 14 + Math.random()*22;
+  h.style.left = (Math.random()*96) + '%';
+  h.style.fontSize = size + 'px';
+  h.style.color = heartColors[Math.floor(Math.random()*heartColors.length)];
+  h.style.animationDuration = (9 + Math.random()*10) + 's';
+  h.style.textShadow = '0 0 8px rgba(255,62,127,0.5)';
+  heartsField.appendChild(h);
+  setTimeout(()=> h.remove(), 20000);
+}
+for(let i=0;i<8;i++){ setTimeout(spawnHeart, i*700); }
+setInterval(spawnHeart, 1400);
+
+/* ---------------- Scroll-reveal for below-fold sections ---------------- */
+const revealObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+document.querySelectorAll('.reveal-on-scroll').forEach(el => revealObserver.observe(el));
+
 /* ---------------- Confetti engine (canvas) ---------------- */
 const canvas = document.getElementById('confetti-canvas');
 const ctx = canvas.getContext('2d');
