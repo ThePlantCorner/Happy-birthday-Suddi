@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Birthday 🎉</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #241436;
+    --plum: #3D2159;
+    --plum-soft: #4E2C6E;
+    --pink: #FF3E7F;
+    --marigold: #FFC845;
+    --teal: #17D9C4;
+    --cream: #FFF7EC;
+    --shadow: 0 10px 30px rgba(20,8,36,0.35);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    margin:0; padding:0; width:100%; overflow-x:hidden;
+    background:var(--ink);
+    color:var(--cream);
+    font-family:'DM Sans', sans-serif;
+    scroll-behavior:smooth;
+  }
+  h1,h2,h3, .display{ font-family:'Baloo 2', sans-serif; }
+  .mono{ font-family:'Space Mono', monospace; letter-spacing:0.08em; }
+
+  #confetti-canvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:40;
+  }
+
+  /* ---------- Tap-to-begin overlay ---------- */
+  #gate{
+    position:fixed; inset:0; z-index:100;
+    background:radial-gradient(circle at 50% 30%, var(--plum-soft), var(--ink) 70%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px; gap:22px;
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  #gate.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+  #gate .balloon-emoji{ font-size:52px; animation:bob 3s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-14px);} }
+  #gate h1{ font-size:clamp(1.8rem, 7vw, 2.6rem); margin:0; color:var(--marigold); }
+  #gate p{ max-width:340px; opacity:.85; line-height:1.5; margin:0; }
+  #nameInput{
+    width:min(280px, 80vw); padding:14px 18px; border-radius:999px; border:2px solid var(--pink);
+    background:rgba(255,255,255,0.06); color:var(--cream); font-family:'DM Sans', sans-serif;
+    font-size:1rem; text-align:center; outline:none;
+  }
+  #nameInput::placeholder{ color:rgba(255,247,236,0.5); }
+  #startBtn{
+    border:none; cursor:pointer; padding:16px 36px; border-radius:999px;
+    background:linear-gradient(135deg, var(--pink), #ff6f9c);
+    color:white; font-family:'Baloo 2', sans-serif; font-weight:700; font-size:1.1rem;
+    box-shadow:var(--shadow); transition:transform .2s ease;
+  }
+  #startBtn:active{ transform:scale(0.95); }
+
+  /* ---------- Layout ---------- */
+  main{ position:relative; z-index:1; }
+  section{
+    min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:48px 20px; position:relative; text-align:center;
+  }
+
+  /* HERO */
+  #hero{
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,62,127,0.25), transparent 40%),
+      radial-gradient(circle at 85% 75%, rgba(23,217,196,0.2), transparent 45%),
+      var(--ink);
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace; letter-spacing:0.3em; text-transform:uppercase;
+    color:var(--teal); font-size:0.75rem; margin-bottom:14px;
+  }
+  #hero h1{
+    font-size:clamp(2.4rem, 11vw, 5.2rem); line-height:1.02; margin:0 0 10px;
+    color:var(--cream);
+  }
+  #hero h1 span{ color:var(--marigold); display:inline-block; }
+  #heroName{ color:var(--pink); }
+  #hero .sub{ max-width:480px; font-size:clamp(1rem,3vw,1.15rem); opacity:.85; margin:0 auto 30px; line-height:1.6; }
+  .balloons{ position:absolute; inset:0; pointer-events:none; z-index:0; }
+  .balloon{
+    position:absolute; bottom:-140px; width:52px; height:64px; border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+    opacity:.85; animation:float linear infinite;
+  }
+  .balloon::after{
+    content:''; position:absolute; left:50%; bottom:-38px; width:1px; height:40px;
+    background:rgba(255,247,236,0.4); transform:translateX(-50%);
+  }
+  @keyframes float{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); }
+    50%{ transform:translateY(-60vh) translateX(20px) rotate(6deg); }
+    100%{ transform:translateY(-120vh) translateX(-10px) rotate(-4deg); }
+  }
+  .cta-row{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .btn{
+    border:none; cursor:pointer; padding:14px 30px; border-radius:999px; font-family:'Baloo 2',sans-serif;
+    font-weight:700; font-size:1rem; box-shadow:var(--shadow); transition:transform .2s ease;
+  }
+  .btn:active{ transform:scale(0.94); }
+  .btn-primary{ background:linear-gradient(135deg, var(--marigold), #ffdd7a); color:var(--ink); }
+  .btn-ghost{ background:transparent; border:2px solid rgba(255,247,236,0.4); color:var(--cream); }
+  .scroll-cue{ margin-top:44px; font-size:0.75rem; letter-spacing:0.2em; text-transform:uppercase; opacity:.5; font-family:'Space Mono',monospace; }
+  .scroll-cue::after{ content:'↓'; display:block; margin-top:6px; animation:bob 2s ease-in-out infinite; }
+
+  /* CAKE / SIGNATURE SECTION */
+  #cake-section{ background:linear-gradient(180deg, var(--ink), var(--plum) 60%, var(--ink)); }
+  #cake-section h2{ font-size:clamp(1.6rem,6vw,2.3rem); color:var(--cream); margin-bottom:6px; }
+  #cake-section .hint{ opacity:.7; font-size:0.95rem; margin-bottom:36px; }
+  #cake-section .hint.done{ color:var(--teal); opacity:1; font-weight:700; }
+
+  .cake-wrap{ position:relative; width:min(300px, 78vw); user-select:none; }
+  .candles{ position:absolute; top:-46px; left:0; right:0; display:flex; justify-content:space-evenly; padding:0 18%; }
+  .candle{ width:10px; height:46px; background:linear-gradient(180deg, #fff, var(--marigold)); border-radius:4px; position:relative; cursor:pointer; }
+  .flame{
+    position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:16px; height:22px;
+    background:radial-gradient(circle at 50% 70%, #fff6c8, var(--marigold) 55%, var(--pink) 100%);
+    border-radius:50% 50% 50% 50%/65% 65% 35% 35%; animation:flicker 1.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 6px rgba(255,200,69,0.8));
+  }
+  @keyframes flicker{ 0%,100%{ transform:translateX(-50%) scale(1) rotate(-2deg);} 50%{ transform:translateX(-50%) scale(1.08) rotate(3deg);} }
+  .candle.out .flame{ display:none; }
+  .candle.out{ background:linear-gradient(180deg, #d8c9b0, #b7a184); }
+  .smoke{
+    position:absolute; top:-24px; left:50%; width:6px; height:6px; border-radius:50%;
+    background:rgba(255,255,255,0.6); opacity:0; pointer-events:none;
+  }
+  .cake-tiers{ display:flex; flex-direction:column; align-items:center; }
+  .tier{ border-radius:14px; box-shadow:inset 0 -6px 0 rgba(0,0,0,0.12); }
+  .tier1{ width:70%; height:34px; background:var(--pink); }
+  .tier2{ width:88%; height:44px; background:var(--marigold); margin-top:-8px; }
+  .tier3{ width:105%; height:54px; background:var(--teal); margin-top:-8px; }
+  .plate{ width:120%; height:12px; background:rgba(255,247,236,0.85); border-radius:50%; margin-top:2px; }
+
+  /* WISH SECTION */
+  #wish-section{ background:var(--cream); color:var(--ink); }
+  #wish-section .card{
+    max-width:560px; background:white; border-radius:24px; padding:clamp(28px,6vw,48px);
+    box-shadow:0 20px 60px rgba(36,20,54,0.18); border:2px dashed var(--pink);
+  }
+  #wish-section .quote-mark{ font-family:'Baloo 2',sans-serif; font-size:3rem; color:var(--pink); line-height:0; display:block; margin-bottom:10px; }
+  #wishText{ font-size:clamp(1.1rem,3.4vw,1.35rem); line-height:1.7; font-style:italic; }
+  #wishText b{ font-style:normal; color:var(--pink); font-family:'Baloo 2',sans-serif; }
+  .signature{ margin-top:26px; font-family:'Space Mono',monospace; font-size:0.85rem; opacity:.6; }
+
+  /* PLAYER SECTION */
+  #player-section{ background:linear-gradient(180deg, var(--ink), var(--plum-soft)); }
+  #player-section h2{ font-size:clamp(1.4rem,5vw,2rem); margin-bottom:22px; }
+  .player{
+    display:flex; align-items:center; gap:18px; background:rgba(255,247,236,0.06);
+    border:1px solid rgba(255,247,236,0.15); padding:16px 20px; border-radius:20px;
+    width:min(420px, 90vw); backdrop-filter:blur(10px);
+  }
+  #playToggle{
+    flex:0 0 auto; width:52px; height:52px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--pink); color:white; font-size:1.2rem; display:flex; align-items:center; justify-content:center;
+  }
+  .player-meta{ flex:1; text-align:left; overflow:hidden; }
+  .player-meta .title{ font-family:'Baloo 2',sans-serif; font-size:1rem; }
+  .player-meta .sub{ font-size:0.75rem; opacity:.6; font-family:'Space Mono',monospace; }
+  .bars{ display:flex; align-items:flex-end; gap:3px; height:20px; }
+  .bars span{ width:3px; background:var(--teal); border-radius:2px; animation:bars 1s ease-in-out infinite; }
+  .bars span:nth-child(2){ animation-delay:.15s;} .bars span:nth-child(3){ animation-delay:.3s;} .bars span:nth-child(4){ animation-delay:.45s;}
+  @keyframes bars{ 0%,100%{ height:4px;} 50%{ height:18px;} }
+  .bars.paused span{ animation-play-state:paused; height:4px; }
+
+  footer{ padding:30px 20px 44px; text-align:center; font-family:'Space Mono',monospace; font-size:0.75rem; opacity:.5; background:var(--plum-soft); }
+
+  @media (prefers-reduced-motion: reduce){
+    .balloon, .flame, .bars span, #gate .balloon-emoji, .scroll-cue::after{ animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Tap-to-begin gate (needed so audio can play on mobile) -->
+<div id="gate">
+  <div class="balloon-emoji">🎈</div>
+  <h1>Someone's got a birthday!</h1>
+  <p>Type their name, then tap start to unwrap the celebration — confetti, cake, and a little song.</p>
+  <input id="nameInput" type="text" placeholder="Their name (optional)" maxlength="24">
+  <button id="startBtn">🎉 Start the celebration</button>
+</div>
+
+<main>
+  <section id="hero">
+    <div class="balloons" id="balloonField"></div>
+    <div class="eyebrow">a small corner of the internet, just for you</div>
+    <h1>Happy <span>Birthday</span><br><span id="heroName">Friend</span>! 🎂</h1>
+    <p class="sub">Another trip around the sun, another year to make wonderful. Here's to cake before dinner, wishes that come true, and a day that feels entirely yours.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="document.getElementById('cake-section').scrollIntoView({behavior:'smooth'})">Blow out the candles</button>
+      <button class="btn btn-ghost" onclick="burstConfetti(140)">More confetti!</button>
+    </div>
+    <div class="scroll-cue">keep scrolling</div>
+  </section>
+
+  <section id="cake-section">
+    <h2 id="cakeHeading">Make a wish, <span id="cakeName">friend</span></h2>
+    <p class="hint" id="cakeHint">tap each candle to blow it out</p>
+    <div class="cake-wrap">
+      <div class="candles" id="candles"></div>
+      <div class="cake-tiers">
+        <div class="tier tier1"></div>
+        <div class="tier tier2"></div>
+        <div class="tier tier3"></div>
+        <div class="plate"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="wish-section">
+    <div class="card">
+      <span class="quote-mark">“</span>
+      <p id="wishText">May this year hand you exactly what you need, disguised as the things you didn't know you wanted. May <b id="wishName">you</b> laugh loudly, rest often, and feel loved every single day of it. Happy birthday!</p>
+      <div class="signature">— with love, from all of us</div>
+    </div>
+  </section>
+
+  <section id="player-section">
+    <h2>a little song for the moment 🎵</h2>
+    <div class="player">
+      <button id="playToggle" aria-label="Play birthday song">▶</button>
+      <div class="player-meta">
+        <div class="title">Happy Birthday</div>
+        <div class="sub" id="playerStatus">tap play</div>
+      </div>
+      <div class="bars paused" id="bars">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <audio id="bdayAudio" src="birthday-song.mp3" preload="auto" loop></audio>
+    <div class="cta-row" style="margin-top:30px;">
+      <button class="btn btn-primary" onclick="burstConfetti(180)">One more round of confetti 🎊</button>
+    </div>
+  </section>
+</main>
+
+<footer>made with care · tap anywhere for a confetti surprise</footer>
+
+<script>
+/* ---------------- Confetti engine (canvas) ---------------- */
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const COLORS = ['#FF3E7F', '#FFC845', '#17D9C4', '#FFF7EC', '#ff6f9c'];
+let particles = [];
+
+function spawnConfetti(x, y, count, burst){
+  for(let i=0;i<count;i++){
+    const angle = burst ? Math.random()*Math.PI*2 : (Math.random()*0.6 + Math.PI*0.7);
+    const speed = burst ? Math.random()*9+3 : Math.random()*2+1;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed - (burst? 4:0),
+      size: Math.random()*7+4,
+      color: COLORS[Math.floor(Math.random()*COLORS.length)],
+      rot: Math.random()*Math.PI*2,
+      vr: (Math.random()-0.5)*0.3,
+      shape: Math.random() > 0.5 ? 'rect':'circle',
+      gravity: 0.15 + Math.random()*0.08,
+      drag: 0.995,
+      life: 0
+    });
+  }
+}
+
+let ambientTimer = 0;
+let ambientOn = false;
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.vx *= p.drag;
+    p.vy += p.gravity;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+    p.life++;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.color;
+    if(p.shape==='rect'){
+      ctx.fillRect(-p.size/2, -p.size/4, p.size, p.size/2);
+    } else {
+      ctx.beginPath();
+      ctx.arc(0,0,p.size/2,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  });
+  particles = particles.filter(p => p.y < H + 40 && p.life < 600);
+
+  if(ambientOn){
+    ambientTimer++;
+    if(ambientTimer % 22 === 0){
+      spawnConfetti(Math.random()*W, -20, 1, false);
+    }
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+function burstConfetti(count=120){
+  spawnConfetti(W/2, H*0.4, count, true);
+}
+
+function startAmbientConfetti(){ ambientOn = true; }
+
+/* Tap anywhere for a small confetti pop */
+document.addEventListener('click', (e)=>{
+  if(document.getElementById('gate').classList.contains('hidden')){
+    spawnConfetti(e.clientX, e.clientY, 18, true);
+  }
+});
+
+/* ---------------- Floating balloons in hero ---------------- */
+const balloonField = document.getElementById('balloonField');
+const balloonColors = ['var(--pink)','var(--marigold)','var(--teal)','#ff6f9c'];
+for(let i=0;i<7;i++){
+  const b = document.createElement('div');
+  b.className = 'balloon';
+  b.style.left = (Math.random()*90+2) + '%';
+  b.style.background = balloonColors[i % balloonColors.length];
+  b.style.animationDuration = (10 + Math.random()*8) + 's';
+  b.style.animationDelay = (Math.random()*8) + 's';
+  b.style.width = (40 + Math.random()*24) + 'px';
+  b.style.height = b.style.width;
+  balloonField.appendChild(b);
+}
+
+/* ---------------- Name personalization ---------------- */
+const nameInput = document.getElementById('nameInput');
+const heroName = document.getElementById('heroName');
+const cakeName = document.getElementById('cakeName');
+const wishName = document.getElementById('wishName');
+
+function applyName(){
+  const val = nameInput.value.trim();
+  const name = val.length ? val : 'Friend';
+  heroName.textContent = name;
+  cakeName.textContent = val.length ? val : 'friend';
+  wishName.textContent = val.length ? val : 'you';
+}
+nameInput.addEventListener('input', applyName);
+
+/* ---------------- Gate / audio unlock ---------------- */
+const gate = document.getElementById('gate');
+const startBtn = document.getElementById('startBtn');
+const audio = document.getElementById('bdayAudio');
+const playToggle = document.getElementById('playToggle');
+const playerStatus = document.getElementById('playerStatus');
+const bars = document.getElementById('bars');
+
+function setPlayingUI(isPlaying){
+  playToggle.textContent = isPlaying ? '❚❚' : '▶';
+  playerStatus.textContent = isPlaying ? 'now playing' : 'paused';
+  bars.classList.toggle('paused', !isPlaying);
+}
+
+startBtn.addEventListener('click', ()=>{
+  applyName();
+  gate.classList.add('hidden');
+  startAmbientConfetti();
+  burstConfetti(160);
+  audio.play().then(()=> setPlayingUI(true)).catch(()=> setPlayingUI(false));
+});
+
+playToggle.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  if(audio.paused){
+    audio.play().then(()=> setPlayingUI(true)).catch(()=>{});
+  } else {
+    audio.pause();
+    setPlayingUI(false);
+  }
+});
+audio.addEventListener('ended', ()=> setPlayingUI(false));
+
+/* ---------------- Interactive candles ---------------- */
+const candlesEl = document.getElementById('candles');
+const NUM_CANDLES = 5;
+let litCount = NUM_CANDLES;
+const cakeHint = document.getElementById('cakeHint');
+
+for(let i=0;i<NUM_CANDLES;i++){
+  const c = document.createElement('div');
+  c.className = 'candle';
+  c.innerHTML = '<div class="flame"></div>';
+  c.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    if(c.classList.contains('out')) return;
+    c.classList.add('out');
+    litCount--;
+    const rect = c.getBoundingClientRect();
+    spawnConfetti(rect.left + rect.width/2, rect.top, 22, true);
+    if(litCount === 0){
+      cakeHint.textContent = 'wish made ✨ happy birthday!';
+      cakeHint.classList.add('done');
+      burstConfetti(200);
+      if(audio.paused){
+        audio.play().then(()=> setPlayingUI(true)).catch(()=>{});
+      }
+    }
+  });
+  candlesEl.appendChild(c);
+}
+</script>
+</body>
+</html>
