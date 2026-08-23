@@ -189,7 +189,7 @@
   <div class="balloon-emoji">🎈</div>
   <h1>Someone's got a birthday!</h1>
   <p>Type their name, then tap start to unwrap the celebration — confetti, cake, and a little song.</p>
-  <input id="nameInput" type="text" placeholder="Their name (optional)" maxlength="24">
+  <input id="nameInput" type="text" placeholder="Their name (optional)" maxlength="24" value="Suddi">
   <button id="startBtn">🎉 Start the celebration</button>
 </div>
 
@@ -360,6 +360,7 @@ function applyName(){
   wishName.textContent = val.length ? val : 'you';
 }
 nameInput.addEventListener('input', applyName);
+applyName();
 
 /* ---------------- Gate / audio unlock ---------------- */
 const gate = document.getElementById('gate');
