@@ -155,6 +155,25 @@
   #cake-section .hint{ opacity:.7; font-size:0.95rem; margin-bottom:36px; }
   #cake-section .hint.done{ color:var(--teal); opacity:1; font-weight:700; }
 
+  #birthdayNumber{
+    margin-top:34px; opacity:0; transform:translateY(18px) scale(0.9);
+    transition:opacity .7s ease, transform .7s cubic-bezier(.34,1.56,.64,1);
+  }
+  #birthdayNumber.show{ opacity:1; transform:translateY(0) scale(1); }
+  #birthdayNumber .num{
+    font-family:'Baloo 2', sans-serif; font-weight:800; line-height:1;
+    font-size:clamp(3.2rem, 16vw, 6rem);
+    background:linear-gradient(135deg, var(--marigold), var(--pink), var(--teal));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 4px 18px rgba(255,62,127,0.35));
+    animation:numPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes numPulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.04);} }
+  #birthdayNumber .caption{
+    margin-top:6px; font-family:'Space Mono', monospace; letter-spacing:0.25em; text-transform:uppercase;
+    font-size:0.8rem; color:var(--cream); opacity:.85;
+  }
+
   .cake-wrap{ position:relative; width:min(300px, 78vw); user-select:none; }
   .candles{ position:absolute; top:-46px; left:0; right:0; display:flex; justify-content:space-evenly; padding:0 18%; }
   .candle{ width:10px; height:46px; background:linear-gradient(180deg, #fff, var(--marigold)); border-radius:4px; position:relative; cursor:pointer; }
@@ -255,6 +274,10 @@
         <div class="tier tier3"></div>
         <div class="plate"></div>
       </div>
+    </div>
+    <div id="birthdayNumber">
+      <div class="num">23</div>
+      <div class="caption">years of celebration 🎉</div>
     </div>
   </section>
 
@@ -483,6 +506,7 @@ for(let i=0;i<NUM_CANDLES;i++){
     if(litCount === 0){
       cakeHint.textContent = 'wish made ✨ happy birthday!';
       cakeHint.classList.add('done');
+      document.getElementById('birthdayNumber').classList.add('show');
       burstConfetti(200);
       if(audio.paused){
         audio.play().then(()=> setPlayingUI(true)).catch(()=>{});
