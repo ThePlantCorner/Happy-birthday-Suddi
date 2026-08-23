@@ -82,7 +82,20 @@
   #gate.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
   #gate .balloon-emoji{ font-size:52px; animation:bob 3s ease-in-out infinite; }
   @keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-14px);} }
-  #gate h1{ font-size:clamp(1.8rem, 7vw, 2.6rem); margin:0; color:var(--marigold); }
+  #gate h1{
+    font-family:'Gill Sans MT', 'Gill Sans', 'Segoe UI', Calibri, sans-serif;
+    font-weight:700;
+    font-size:clamp(1.8rem, 7vw, 2.6rem); margin:0; color:#ffffff;
+    animation:glowPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes glowPulse{
+    0%,100%{
+      text-shadow:0 0 10px rgba(255,255,255,0.55), 0 0 22px rgba(255,255,255,0.3), 0 0 40px rgba(255,200,69,0.25);
+    }
+    50%{
+      text-shadow:0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.55), 0 0 60px rgba(255,200,69,0.45);
+    }
+  }
   #gate p{ max-width:340px; opacity:.85; line-height:1.5; margin:0; }
   #nameInput{
     width:min(280px, 80vw); padding:14px 18px; border-radius:999px; border:2px solid var(--pink);
@@ -245,7 +258,6 @@
 <div id="gate">
   <div class="balloon-emoji reveal r1">🎈</div>
   <h1 class="reveal r2">Someone's got a birthday!</h1>
-  <p class="reveal r3">Type their name, then tap start to unwrap the celebration — confetti, cake, and a little song.</p>
   <input id="nameInput" class="reveal r4" type="text" placeholder="Their name (optional)" maxlength="24" value="Suddi">
   <button id="startBtn" class="reveal r5">🎉 Start the celebration</button>
 </div>
